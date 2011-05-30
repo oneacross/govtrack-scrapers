@@ -1,0 +1,82 @@
+GovTrack.us Screen Scraping Scripts (Python Version)
+===
+    
+    Copyright (C) 2011 Civic Impulse, LLC
+
+    This package is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    Under this license, if you modify this package as part of a service
+    you provide (e.g. for a website), you must prominently offer on
+    your website the modifications you made to this package.
+    
+---
+
+This package contains a Python rewrite of screen-scraping scripts
+used by GovTrack.us. The scripts are currently experimental.
+
+For more information, see http://www.govtrack.us/developers/.
+
+Configuration
+---
+
+You will need to set up the GovTrack database of Members of Congress.
+This database is maintained by hand, so there is no corresponding scraper.
+
+	1) Create a database (probably with MySQL).
+	
+	2) Load the data into the database. The latest dump of the database can
+	    be found in:
+	    
+	      http://www.govtrack.us/data/db/database.people.sql.gz
+	      
+	    You will find the file database.people.sql which is a MySQL dump of two tables:
+	    people and people_roles. Load this file into MySQL:
+	    
+	      gunzip -c database.people.sql.gz | mysql -u username -p database_name
+	
+	    You can also access this file by checking out the Subversion repository for the
+	    older scrapers and loading in the appropriate file.
+	    
+	      svn co svn://occams.info/govtrack/gather/us govtrack_legacy_scrapers
+	      cat govtrack_legacy_scrapers/database.people.sql | mysql -u username -p database_name
+	      
+	3) Create a SQLAlchemy connection string for the database. For MySQL, use e.g.
+	
+		mysql://username:password@127.0.0.1/database_name?charset=utf8&use_unicode=0
+		
+		and put this into a file named config.db in this directory.
+		
+The scripts are currently set up to mirror any content downloaded from a remote
+website into ../mirror/url_hostname/md5_of_url. This is meant to speed up subsequent
+scrapes of the same URL, especially during testing.
+
+Additionally, the scripts are hard-coded to output the resulting XML into ../data/us.
+
+
+us_bills.py
+---
+
+Scrapes bill and resolution information from Thomas.loc.gov. This script is unfinished.
+The part that works is detecting which bills need to be updated. Parsing bill information
+is partially complete but doesn't save any XML to disk yet.
+
+It will help to have the file ../data/us/committees.xml already present. You can get this file
+from http://www.govtrack.us/data/us/committees.xml.
+
+To execute this script, you can write another script and run the code as:
+
+	import us_bills
+	
+	# Parse all bills:
+	us_bills.update_bills(112, True)
+		# 112 is the number of the current Congress
+		# True forces an update of all files, set to False to update only bills detected as changed
+	
+	# Parse an individual bill:
+	us_bills.parse_bill(112, "h", 1)
+		# This is the congress number, the bill type (according to the GovTrack bill type codes),
+		# and the bill number.
+	
