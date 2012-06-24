@@ -517,7 +517,7 @@ def parse_bill(congress, bill_type, bill_number):
 	except:
 		pass
 
-	print etree.tostring(root, pretty_print=True)
+	return etree.tostring(root, pretty_print=True)
 
 
 def parse_bill_action(line, bill_type, prev_state, title):
@@ -1194,5 +1194,5 @@ def find_committee(committee, subcommittee, congress):
 
 if __name__ == "__main__":
 	#update_bills(112, True)
-	parse_bill(112, "h", 1)
+	print parse_bill(112, "h", 1)
 	
